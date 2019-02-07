@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "Avido Food's base JS ESLint configuration",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/avidofood/eslint-config-avidofood.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tschaub/avidofood/eslint-config-avidofood/issues"
+  },
   "scripts": {
     "lint": "lint ."
   },
