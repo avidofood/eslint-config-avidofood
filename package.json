@@ -1,6 +1,6 @@
 {
-  "name": "eslint-conifg-avidofood",
-  "version": "1.0.0",
+  "name": "eslint-config-avidofood",
+  "version": "1.0.1",
   "description": "Avido Food's base JS ESLint configuration",
   "main": "index.js",
   "repository": {
@@ -8,14 +8,15 @@
     "url": "git://github.com/avidofood/eslint-config-avidofood.git"
   },
   "bugs": {
-    "url": "https://github.com/tschaub/avidofood/eslint-config-avidofood/issues"
+    "url": "https://github.com/avidofood/eslint-config-avidofood/issues"
   },
   "scripts": {
     "lint": "lint ."
   },
   "keywords": [
     "eslint",
-    "eslintconfig"
+    "eslintconfig",
+    "eslintvue"
   ],
   "author": "Philipp Mochine",
   "license": "MIT",
