@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-avidofood",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Avido Food's base JS ESLint configuration",
   "main": "index.js",
   "repository": {
