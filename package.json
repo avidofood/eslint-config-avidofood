@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-avidofood",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Avido Food's base JS ESLint configuration",
   "main": "index.js",
   "repository": {
@@ -21,6 +21,7 @@
   "author": "Philipp Mochine",
   "license": "MIT",
   "dependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-vue": "^7.1.0"
