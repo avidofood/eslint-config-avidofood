@@ -1,8 +1,6 @@
 module.exports = {
-    "extends": ["airbnb-base", "plugin:vue/base", "plugin:vue/essential", "plugin:vue/strongly-recommended"],
-    "parserOptions": {
-        "parser": "babel-eslint",
-    },
+    "extends": ["airbnb-base", "plugin:vue/base", "plugin:vue/vue3-essential", "plugin:vue/vue3-strongly-recommended"],
+    "parser": "vue-eslint-parser", // You don't need this line. It's just extra.
     rules: {
         "quotes": [
             "error",
