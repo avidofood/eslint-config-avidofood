@@ -10,9 +10,9 @@ The config contains:
 
 ### Installation
 
-Version 4 needs ESLint 9. Install ESLint and this package as development dependencies:
+Version 5 needs ESLint 10. Install ESLint and this package as development dependencies:
 
-    npm install --save-dev eslint@9 eslint-config-avidofood
+    npm install --save-dev eslint@10 eslint-config-avidofood
 
 Create `eslint.config.js` in the root of your project:
 
@@ -30,22 +30,27 @@ export default [
 
 If your `package.json` has no `"type": "module"`, name the file `eslint.config.mjs`.
 
-Then lint your project with `npx eslint .`. ESLint 9 lints `.js`, `.mjs`, `.cjs` and `.vue` files without the old `--ext` option. The config lints `.cjs` files as CommonJS.
+Then lint your project with `npx eslint .`. ESLint lints `.js`, `.mjs`, `.cjs` and `.vue` files without the old `--ext` option. The config lints `.cjs` files as CommonJS.
 
 See the ESLint [configuration guide](https://eslint.org/docs/latest/use/configure/) for details.
 
 ### Upgrade from version 3
 
-1. Install ESLint 9 and version 4 of this package.
+1. Install ESLint 10 and version 5 of this package.
 2. Remove `eslint-plugin-import`, `eslint-plugin-vue` and `eslint-config-airbnb-base` from your dependencies. This package brings the plugins it needs.
 3. Create `eslint.config.js` as shown above.
-4. Delete `.eslintrc.js` or the `eslintConfig` entry in `package.json`. ESLint 9 ignores them.
+4. Delete `.eslintrc.js` or the `eslintConfig` entry in `package.json`. ESLint 9 and later ignore them.
 5. Remove `--ext` from your lint script.
 
-The rules are the same as in version 3.2.0. Version 4 adds three rules from eslint-plugin-vue 10: `vue/no-deprecated-delete-set`, `vue/no-deprecated-model-definition` and `vue/valid-define-options`.
+The rules are the same as in version 3.2.0. Version 4 and later add three rules from eslint-plugin-vue 10: `vue/no-deprecated-delete-set`, `vue/no-deprecated-model-definition` and `vue/valid-define-options`.
+
+### Upgrade from version 4
+
+Install ESLint 10 and version 5 of this package. If your project lists `eslint-plugin-import` itself, you can remove it: version 5 uses `eslint-plugin-import-x`, which supports ESLint 10. The rule names stay `import/...`, so your own rule settings keep working.
 
 ### Older ESLint versions
 
+- ESLint 9: use version 4 (`npm install --save-dev eslint-config-avidofood@4`).
 - ESLint 8: use version 3 (`npm install --save-dev eslint-config-avidofood@3`).
 - ESLint 6 and older: use version 1.1.0.
 
