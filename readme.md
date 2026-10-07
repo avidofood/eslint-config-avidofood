@@ -55,6 +55,8 @@ Run `npm test` and `npm run lint`.
 
 To release, set the new version in `package.json`, add it to `CHANGELOG.md` and merge into `master`. Then push a tag with the version number, for example `git tag 4.0.1 && git push origin 4.0.1`. The `Release` workflow runs the lint and the tests and publishes the package to npm with npm trusted publishing, so it needs no npm token and no 2FA prompt. Run the workflow by hand to check the setup. That run publishes nothing.
 
+On npmjs.com, the trusted publisher of the package points to this repository, the workflow `release.yml` and the environment `npm-publish`. Under "Allowed actions", it must allow `npm publish`. A new trusted publisher expires if it does not publish within 2 days, so create it right before a release.
+
 ### License
 
 MIT. The folder `airbnb` contains the rules of eslint-config-airbnb-base 15.0.0 under the MIT license of Airbnb, see `airbnb/README.md`. That package only supports ESLint 8, so this package includes its rules.
