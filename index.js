@@ -15,6 +15,17 @@ import strict from './airbnb/strict.cjs';
 const airbnbRules = [bestPractices, errors, node, style, variables, es6, imports, strict]
     .reduce((rules, file) => ({ ...rules, ...file.rules }), {});
 
+// ESLint 9 changed the defaults of these rules. The options keep the behavior of ESLint 8,
+// so that the rules work as in version 3.
+const eslint8Defaults = {
+    'no-unused-vars': ['error', {
+        ...variables.rules['no-unused-vars'][1],
+        caughtErrors: 'none',
+    }],
+    'no-inner-declarations': ['error', 'functions', { blockScopedFunctions: 'disallow' }],
+    'no-useless-computed-key': ['error', { enforceForClassMembers: false }],
+};
+
 export default [
     {
         name: 'avidofood/airbnb-base',
@@ -28,7 +39,10 @@ export default [
                 ...globals.node, // env node of airbnb-base
             },
         },
-        rules: airbnbRules,
+        rules: {
+            ...airbnbRules,
+            ...eslint8Defaults,
+        },
     },
     ...vue.configs['flat/strongly-recommended'],
     {
@@ -36,10 +50,6 @@ export default [
         languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'module',
-            parserOptions: {
-                ecmaVersion: 'latest',
-                sourceType: 'module',
-            },
             globals: {
                 ...globals.browser,
                 trans: 'readonly', // ignores trans in vue
@@ -100,6 +110,14 @@ export default [
                 enforceForRenamedProperties: false,
             }],
             'no-tabs': 'off', // why shouldn't I use tab?
+        },
+    },
+    {
+        // .cjs files are CommonJS, also in projects with "type": "module"
+        name: 'avidofood/commonjs',
+        files: ['**/*.cjs'],
+        languageOptions: {
+            sourceType: 'commonjs',
         },
     },
 ];

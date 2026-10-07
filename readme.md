@@ -30,7 +30,7 @@ export default [
 
 If your `package.json` has no `"type": "module"`, name the file `eslint.config.mjs`.
 
-Then lint your project with `npx eslint .`. ESLint 9 lints `.js`, `.mjs`, `.cjs` and `.vue` files without the old `--ext` option.
+Then lint your project with `npx eslint .`. ESLint 9 lints `.js`, `.mjs`, `.cjs` and `.vue` files without the old `--ext` option. The config lints `.cjs` files as CommonJS.
 
 See the ESLint [configuration guide](https://eslint.org/docs/latest/use/configure/) for details.
 

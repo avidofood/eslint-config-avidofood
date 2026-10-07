@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import { ESLint } from 'eslint';
 import config from '../index.js';
+
+const require = createRequire(import.meta.url);
+const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 
 const eslint = new ESLint({ overrideConfigFile: true, overrideConfig: config });
 
@@ -86,4 +91,47 @@ test('destructures objects but not arrays in declarations', async () => {
 test('turns off the rules that avidofood turned off', async () => {
     const code = 'import missing from \'does-not-exist\';\n\nexport default missing + undefinedGlobal;\n';
     assert.deepEqual(await lint(code, 'src/off.js'), []);
+});
+
+test('keeps the ESLint 8 behavior of rules whose defaults changed in ESLint 9', async () => {
+    const caught = await lint('try {\n    JSON.parse(\'{}\');\n} catch (error) {\n    JSON.parse(\'[]\');\n}\n', 'src/caught.js');
+    assert.ok(!caught.includes('no-unused-vars'));
+
+    const inner = await lint('export default function a(b) {\n    if (b) {\n        function c() {\n            return b;\n        }\n        return c();\n    }\n    return 0;\n}\n', 'src/inner.js');
+    assert.ok(inner.includes('no-inner-declarations'));
+
+    const computed = await lint('export default class A {\n    [\'b\']() {\n        return this;\n    }\n}\n', 'src/computed.js');
+    assert.ok(!computed.includes('no-useless-computed-key'));
+});
+
+test('lints .cjs files as CommonJS', async () => {
+    const [commonjs] = await eslint.lintText('module.exports = { a: 1 };\n', { filePath: 'src/commonjs.cjs' });
+    assert.deepEqual(commonjs.messages, []);
+
+    const [esm] = await eslint.lintText('export default 1;\n', { filePath: 'src/esm.cjs' });
+    assert.ok(esm.messages.some((message) => message.fatal));
+});
+
+test('lets a project set its own ECMAScript version', async () => {
+    const es2020 = new ESLint({
+        overrideConfigFile: true,
+        overrideConfig: [...config, { languageOptions: { ecmaVersion: 2020 } }],
+    });
+    const code = 'export default 1_000;\n';
+
+    const [old] = await es2020.lintText(code, { filePath: 'src/old.js' });
+    assert.ok(old.messages.some((message) => message.fatal));
+    assert.deepEqual(await lint(code, 'src/latest.js'), []);
+});
+
+test('declares every required peer dependency of eslint-plugin-vue', async () => {
+    const own = await readJson(new URL('../package.json', import.meta.url));
+    const plugin = await readJson(require.resolve('eslint-plugin-vue/package.json'));
+    const optional = plugin.peerDependenciesMeta ?? {};
+    const required = Object.keys(plugin.peerDependencies)
+        .filter((name) => !optional[name]?.optional);
+
+    required.forEach((name) => {
+        assert.ok(own.dependencies[name] || own.peerDependencies[name], `${name} is missing`);
+    });
 });
