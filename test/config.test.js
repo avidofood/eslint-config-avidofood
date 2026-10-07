@@ -93,6 +93,14 @@ test('turns off the rules that avidofood turned off', async () => {
     assert.deepEqual(await lint(code, 'src/off.js'), []);
 });
 
+test('keeps the earlier behavior of no-shadow-restricted-names, changed in ESLint 10', async () => {
+    const rules = await lint('export default function a(globalThis) {\n    return globalThis;\n}\n', 'src/shadow.js');
+    assert.ok(!rules.includes('no-shadow-restricted-names'));
+
+    const undefinedShadow = await lint('export default function a(undefined) {\n    return undefined;\n}\n', 'src/undefined.js');
+    assert.ok(undefinedShadow.includes('no-shadow-restricted-names'));
+});
+
 test('keeps the ESLint 8 behavior of rules whose defaults changed in ESLint 9', async () => {
     const caught = await lint('try {\n    JSON.parse(\'{}\');\n} catch (error) {\n    JSON.parse(\'[]\');\n}\n', 'src/caught.js');
     assert.ok(!caught.includes('no-unused-vars'));

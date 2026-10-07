@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-avidofood",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Avido Food's base JS ESLint configuration",
   "type": "module",
   "main": "./index.js",
@@ -33,16 +33,17 @@
   "author": "Philipp Mochine",
   "license": "MIT",
   "peerDependencies": {
-    "eslint": "^9.0.0"
+    "eslint": "^10.0.0"
   },
   "dependencies": {
     "confusing-browser-globals": "^1.0.11",
-    "eslint-plugin-import": "^2.32.0",
+    "eslint-import-resolver-node": "^0.4.0",
+    "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-vue": "^10.11.1",
     "globals": "^17.13.0",
     "vue-eslint-parser": "^10.3.0"
   },
   "devDependencies": {
-    "eslint": "^9.39.5"
+    "eslint": "^10.12.0"
   }
 }

@@ -1,4 +1,4 @@
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 import bestPractices from './airbnb/best-practices.cjs';
@@ -15,15 +15,22 @@ import strict from './airbnb/strict.cjs';
 const airbnbRules = [bestPractices, errors, node, style, variables, es6, imports, strict]
     .reduce((rules, file) => ({ ...rules, ...file.rules }), {});
 
-// ESLint 9 changed the defaults of these rules. The options keep the behavior of ESLint 8,
+// eslint-plugin-import does not support ESLint 10. eslint-plugin-import-x has the same rules.
+// It is registered as "import", so the rule names stay "import/...". Its settings use the
+// prefix "import-x/".
+const importSettings = Object.fromEntries(Object.entries(imports.settings)
+    .map(([key, value]) => [key.replace(/^import\//, 'import-x/'), value]));
+
+// ESLint 9 and 10 changed the defaults of these rules. The options keep the behavior of ESLint 8,
 // so that the rules work as in version 3.
-const eslint8Defaults = {
+const previousDefaults = {
     'no-unused-vars': ['error', {
         ...variables.rules['no-unused-vars'][1],
         caughtErrors: 'none',
     }],
     'no-inner-declarations': ['error', 'functions', { blockScopedFunctions: 'disallow' }],
     'no-useless-computed-key': ['error', { enforceForClassMembers: false }],
+    'no-shadow-restricted-names': ['error', { reportGlobalThis: false }],
 };
 
 export default [
@@ -32,7 +39,7 @@ export default [
         plugins: {
             import: importPlugin,
         },
-        settings: imports.settings,
+        settings: importSettings,
         languageOptions: {
             globals: {
                 ...globals.es2015, // env es6 of airbnb-base
@@ -41,7 +48,7 @@ export default [
         },
         rules: {
             ...airbnbRules,
-            ...eslint8Defaults,
+            ...previousDefaults,
         },
     },
     ...vue.configs['flat/strongly-recommended'],
