@@ -1,5 +1,20 @@
 # Changelog
 
+## 5.0.0
+
+### Breaking changes
+
+- The config needs ESLint 10. For ESLint 9, use version 4.
+
+### Changed
+
+- `eslint-plugin-import` does not support ESLint 10. `eslint-plugin-import-x` replaces it. It has the same rules and is registered as `import`, so the rule names stay `import/...`.
+- ESLint 10 reports `globalThis` in `no-shadow-restricted-names` by default. The config keeps the earlier behavior.
+- The import rules use the node resolver of airbnb through `importXResolverCompat`, as before. Packages with `main` and `jsnext:main` resolve the same way.
+- Known difference: `import/no-named-as-default` in eslint-plugin-import-x does not check names that a module re-exports with `export * from` or `export { name } from`. eslint-plugin-import did.
+- The other rules work as in 4.0.0.
+- Releases are published from GitHub Actions with npm trusted publishing.
+
 ## 4.0.0
 
 ### Breaking changes

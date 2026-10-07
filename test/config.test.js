@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import {
+    mkdtemp, mkdir, readFile, rm, writeFile,
+} from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import { ESLint } from 'eslint';
@@ -93,6 +97,14 @@ test('turns off the rules that avidofood turned off', async () => {
     assert.deepEqual(await lint(code, 'src/off.js'), []);
 });
 
+test('keeps the earlier behavior of no-shadow-restricted-names, changed in ESLint 10', async () => {
+    const rules = await lint('export default function a(globalThis) {\n    return globalThis;\n}\n', 'src/shadow.js');
+    assert.ok(!rules.includes('no-shadow-restricted-names'));
+
+    const undefinedShadow = await lint('export default function a(undefined) {\n    return undefined;\n}\n', 'src/undefined.js');
+    assert.ok(undefinedShadow.includes('no-shadow-restricted-names'));
+});
+
 test('keeps the ESLint 8 behavior of rules whose defaults changed in ESLint 9', async () => {
     const caught = await lint('try {\n    JSON.parse(\'{}\');\n} catch (error) {\n    JSON.parse(\'[]\');\n}\n', 'src/caught.js');
     assert.ok(!caught.includes('no-unused-vars'));
@@ -134,4 +146,25 @@ test('declares every required peer dependency of eslint-plugin-vue', async () =>
     required.forEach((name) => {
         assert.ok(own.dependencies[name] || own.peerDependencies[name], `${name} is missing`);
     });
+});
+
+test('resolves package entry points like eslint-plugin-import', async () => {
+    // A package whose "jsnext:main" is an ES module and whose "main" is CommonJS
+    const dir = await mkdtemp(join(tmpdir(), 'avidofood-resolver-'));
+    try {
+        await mkdir(join(dir, 'legacy'));
+        await mkdir(join(dir, 'src'));
+        await writeFile(join(dir, 'legacy', 'package.json'), JSON.stringify({ main: 'cjs.js', 'jsnext:main': 'esm.js' }));
+        await writeFile(join(dir, 'legacy', 'cjs.js'), 'module.exports = { present: 1 };\n');
+        await writeFile(join(dir, 'legacy', 'esm.js'), 'export const present = 1;\n');
+        const inDir = new ESLint({ cwd: dir, overrideConfigFile: true, overrideConfig: config });
+
+        const [result] = await inDir.lintText('import { missing } from \'../legacy\';\n\nexport default missing;\n', {
+            filePath: join(dir, 'src', 'use.js'),
+        });
+
+        assert.ok(result.messages.some((message) => message.ruleId === 'import/named'));
+    } finally {
+        await rm(dir, { recursive: true, force: true });
+    }
 });
