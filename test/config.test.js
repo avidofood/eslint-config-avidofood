@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import {
+    mkdtemp, mkdir, readFile, rm, writeFile,
+} from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import { ESLint } from 'eslint';
@@ -142,4 +146,25 @@ test('declares every required peer dependency of eslint-plugin-vue', async () =>
     required.forEach((name) => {
         assert.ok(own.dependencies[name] || own.peerDependencies[name], `${name} is missing`);
     });
+});
+
+test('resolves package entry points like eslint-plugin-import', async () => {
+    // A package whose "jsnext:main" is an ES module and whose "main" is CommonJS
+    const dir = await mkdtemp(join(tmpdir(), 'avidofood-resolver-'));
+    try {
+        await mkdir(join(dir, 'legacy'));
+        await mkdir(join(dir, 'src'));
+        await writeFile(join(dir, 'legacy', 'package.json'), JSON.stringify({ main: 'cjs.js', 'jsnext:main': 'esm.js' }));
+        await writeFile(join(dir, 'legacy', 'cjs.js'), 'module.exports = { present: 1 };\n');
+        await writeFile(join(dir, 'legacy', 'esm.js'), 'export const present = 1;\n');
+        const inDir = new ESLint({ cwd: dir, overrideConfigFile: true, overrideConfig: config });
+
+        const [result] = await inDir.lintText('import { missing } from \'../legacy\';\n\nexport default missing;\n', {
+            filePath: join(dir, 'src', 'use.js'),
+        });
+
+        assert.ok(result.messages.some((message) => message.ruleId === 'import/named'));
+    } finally {
+        await rm(dir, { recursive: true, force: true });
+    }
 });
